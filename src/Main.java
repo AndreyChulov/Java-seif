@@ -1,24 +1,16 @@
 import DataModel.TurnResult;
-import com.sun.source.util.TaskEvent;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.time.Period;
 
 public class Main implements Runnable{
     private static final int TARGET_GAMES_COUNT = 1000;
     private static int _gamesCount = 0;
     private static List<Number> _gamesStatistics = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         List<Thread> threads = new java.util.ArrayList<>();
 
         for (int counter = 0; counter < TARGET_GAMES_COUNT; counter++) {
@@ -59,6 +51,14 @@ public class Main implements Runnable{
         System.out.println("Time takes to get statistics: " + elapsedTime/1000.0 + " seconds.");
         System.out.println("--------------------------------------------------------");
 
+        try (SqLite db = new SqLite()){
+            try {
+                db.ExecuteWithoutResult("DROP TABLE IF EXISTS BotChampion;");
+                db.ExecuteWithoutResult("CREATE TABLE IF NOT EXISTS BotChampion (ID INT, TotalWins INT, TotalTries INT);");
+            } catch (Exception ex){
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 
     @Override
